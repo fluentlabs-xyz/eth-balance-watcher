@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  eth-balance-watcher:
+    build: .
+    container_name: eth-balance-watcher
+    ports:
+      - "9090:9090"
+    environment:
+      - ETH_RPC_URL=https://rpc.testnet.fluent.xyz
+      - CHECK_INTERVAL=${CHECK_INTERVAL:-60s}
+      - METRICS_PORT=${METRICS_PORT:-9090}
+      - WALLETS_FILE=${WALLETS_FILE:-wallets.txt}
+    volumes:
+      - ./wallets.txt:/app/wallets.txt:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+
+volumes:
+  prometheus_data:

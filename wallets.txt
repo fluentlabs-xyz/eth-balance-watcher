@@ -1,0 +1,7 @@
+# Wallet configuration file
+# Format: name:address
+# Lines starting with # are comments
+
+# Example wallets (replace with your own)
+quicknode-faucet:0x10Dae473368e935bB77385FfF5488BE855eB2C2F
+faucet:0xB72988b6DdC94E577E98C5565E0e11E688537e73
